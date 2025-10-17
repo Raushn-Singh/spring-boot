@@ -1,0 +1,5 @@
+package com.training.springboot.table;
+
+public class TableCreator {
+
+}

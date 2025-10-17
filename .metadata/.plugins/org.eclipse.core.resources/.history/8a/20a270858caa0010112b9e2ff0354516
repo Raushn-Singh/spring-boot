@@ -1,0 +1,49 @@
+package com.training.springboot.operation;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.modal.Employee;
+import com.training.springboot.repositary.EmployeeRepositary;
+
+
+@Component
+public class EmployeeOperationsTwo {
+    @Autowired
+	EmployeeRepositary employeeRepositary;
+    public void deleteEmpById(long empId) {
+    	employeeRepositary.deleteById(1l);
+    }
+ // how to delete data based on non primary key columns:
+ // delete all employees based on country
+   
+    // req: update employee salary 
+    // there is no method available for update
+    //use save()  for update operations also
+    // save()-> insert/update 
+    public void updateEmployeeSalaryByEmpId(long fempId) {
+    // req :id is 5 -> 10000salary
+    	Employee emp=new Employee();
+    	
+    	emp.setEmpId(fempId);
+    	emp.setSalary(10000);
+    	employeeRepositary.save(emp);
+    	// Option 1 : entity object is again filled with all other column
+    }
+    // option 2:load /find emp
+    public void updateEmployeeSalaryByEmpId2(long fempId) {
+    	// req :id is 5 -> 10000salary
+       // find record existed or not with pk value column
+    	Optional<Employee> empdata = employeeRepositary.findById(fempId);
+    	if(empdata.isPresent()) {
+    		Employee emp=empdata.get();
+    		System.out.println("Employee is found"+emp);
+    	}else {
+    		System.out.println("No emplpoyee Found");
+    	}
+    
+    }
+
+}

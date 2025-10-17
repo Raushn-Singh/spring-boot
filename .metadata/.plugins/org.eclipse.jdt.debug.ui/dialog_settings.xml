@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="org.eclipse.jdt.debug.ui.jre_preference_page_context.columnWidth0" value="72"/>
+	<item key="org.eclipse.jdt.debug.ui.jre_preference_page_context.columnWidth1" value="665"/>
+	<item key="org.eclipse.jdt.debug.ui.jre_preference_page_context.columnWidth2" value="80"/>
+	<item key="org.eclipse.jdt.debug.ui.jre_preference_page_context.sortColumn" value="1"/>
+	<section name="org.eclipse.jdt.debug.ui.MAIN_METHOD_SELECTION_DIALOG">
+		<item key="ShowStatusLine" value="true"/>
+		<item key="History" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;History&gt;&#x0D;&#x0A;&lt;historyRootNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=spring-boot-first-application/src\/main\/java&amp;lt;com.training.lms{SpringBootFirstApplication.java[SpringBootFirstApplication&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_02_spring-boot-field-di/src\/main\/java&amp;lt;com.training.lms{SpringBootFieldDiApplication.java[SpringBootFieldDiApplication&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_05_spring-boot-di-interface/src\/main\/java&amp;lt;com.training.interfaces{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_06_spring-boot-value-annoatation/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_07_Spring_Bean_scopes/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_08_Spring_Bean_life_cycle/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_09_spring_boot_runners/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_10_spring_boot_jdbc/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_11_spring_boot_jdbc/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_12_spring_boot_jpa/src\/main\/java&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;infoNode&gt;=_13_spring_boot_jpa-app-two/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&amp;lt;com.training.springboot{Application.java[Application&lt;/infoNode&gt;&#x0D;&#x0A;&lt;/historyRootNode&gt;&#x0D;&#x0A;&lt;/History&gt;"/>
+		<section name="DialogBoundsSettings">
+			<item key="DIALOG_HEIGHT" value="500"/>
+			<item key="DIALOG_WIDTH" value="600"/>
+			<item key="DIALOG_X_ORIGIN" value="174"/>
+			<item key="DIALOG_Y_ORIGIN" value="117"/>
+			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		</section>
+	</section>
+</section>

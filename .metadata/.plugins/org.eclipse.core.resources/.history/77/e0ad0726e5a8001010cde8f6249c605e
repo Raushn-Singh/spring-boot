@@ -1,0 +1,21 @@
+package com.training.springboot.operation;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.repositary.EmployeeRepositary;
+
+@Component
+public class EmployeeOperationsTwo {
+    @Autowired
+	EmployeeRepositary employeeRepositary;
+    public void deleteEmpById(long empId) {
+    	employeeRepositary.deleteById(1l);
+    }
+ // how to delete data based on non primary key columns:
+ 	// delete all employees based on country
+ 	public void deleteByCountry(String country) {
+ 		int country2 = employeeRepositary.deleteByCountry(country);
+ 		System.out.println(country2);
+ 	}
+}

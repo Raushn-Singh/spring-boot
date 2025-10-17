@@ -1,0 +1,10 @@
+package com.training.springboot.repositary;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.training.springboot.modal.Employee;
+
+public interface EmployeeRepositary extends JpaRepository<Employee, Long>{
+     // custom findBy method 
+	public void findBy<String city>(String city);
+}

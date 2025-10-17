@@ -1,0 +1,6 @@
+package com.training.springboot.dao;
+
+
+public interface ProductDao {
+
+}

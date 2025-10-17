@@ -1,0 +1,11 @@
+package com.training.springboot.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="user) //database table name
+public class UserInformation {
+
+	
+}

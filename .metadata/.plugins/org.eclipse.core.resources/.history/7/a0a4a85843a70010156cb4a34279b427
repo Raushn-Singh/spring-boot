@@ -1,0 +1,24 @@
+package com.training.springboot.operations;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.entity.ProductDetails;
+import com.training.springboot.repositary.ProductDetailsRepositary;
+
+@Component
+public class DatabaseOperationTwo {
+
+	ProductDetailsRepositary productDetailsRepositary;
+	// inserting more than one record ; Inserting more than one recored;
+	public void addMoreProducts() {
+		List<ProductDetails> allproducts=new ArrayList<>();
+	    allproducts.add(new ProductDetails(222,"Mouse",50000));
+	    allproducts.add(new ProductDetails(223,"keyboard",50000));
+	    allproducts.add(new ProductDetails(224,"Disk",50000));
+	    allproducts.add(new ProductDetails(225,"speaker",50000));
+		productDetailsRepositary.saveAll(null);
+	}
+}

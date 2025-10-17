@@ -1,0 +1,9 @@
+package com.training.springboot.repositary;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.training.springboot.entity.UserInformations;
+
+public interface UserDetailsRepo extends CrudRepository<UserInformations, Long>{
+
+}

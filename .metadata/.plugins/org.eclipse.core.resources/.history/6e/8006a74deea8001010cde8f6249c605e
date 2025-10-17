@@ -1,0 +1,23 @@
+package com.training.springboot.repositary;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.training.springboot.modal.Employee;
+
+
+public interface EmployeeRepositary extends JpaRepository<Employee, Long>{
+     // custom findBy method 
+	List<Employee> findByCity(String city);
+	List<Employee> findByGender(String gender);
+	List<Employee> findByCountry(String country);
+	//get employee based on gender and country
+	List<Employee> findByGenderAndCountry(String gender,String country);
+	List<Employee> findByGenderOrCity(String gender,String city);
+	@Modifying
+	@Transactional
+	int deleteByCountry(String country);
+}

@@ -1,0 +1,14 @@
+package com.training.springboot.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="product") //database table name
+public class ProductDetails {
+  // defining properties :based no of columns
+	private int productId;
+	private String productName;
+	private double productPrice;
+	
+}

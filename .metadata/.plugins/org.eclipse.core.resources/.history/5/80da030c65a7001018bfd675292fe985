@@ -1,0 +1,22 @@
+package com.training.springboot.operation;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.modal.Employee;
+import com.training.springboot.repositary.EmployeeRepositary;
+
+@Component
+public class EmployeeOperations {
+
+	@Autowired
+	EmployeeRepositary employeeRepositary;
+    
+	public void addMoreEmployees() {
+		List<Employee> employees=new ArrayList<>();
+		employees.add(new Employee(1,"One",28,30000.00f,"Hyd","Female","india"));
+	}
+}
