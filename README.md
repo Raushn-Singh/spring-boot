@@ -737,3 +737,287 @@ If you see the same memory reference printed for two beans, it means **singleton
 ---
 
 This explanation helps beginners clearly understand how **Spring Boot creates and injects beans**, how **scopes affect object creation**, and how **the lifecycle of a bean** works in simple, real-world terms.
+
+# 🌱 Spring Boot Bean Lifecycle and Scope (Beginner to Advanced)
+
+## 🧩 1. Introduction
+
+In **Spring Boot**, every object managed by the **Spring Container** is called a **Bean**.  
+The container controls its **creation**, **initialization**, and **destruction** — this process is known as the **Bean Lifecycle**.
+
+---
+
+## 🚀 2. Project Overview
+
+This example demonstrates:
+- How beans are created and managed by Spring Boot
+- The difference between annotations and configuration-based bean definitions
+- How to handle initialization and destruction phases
+- The difference between `singleton` and `prototype` scope
+
+### Project Structure:
+```
+com.training.springboot
+ ├── Application.java
+ └── databse
+      ├── DatabaseConnection.java
+      ├── EmailConnection.java
+      └── SprinBeansConfiguration.java
+```
+
+---
+
+## 🏁 3. Application Entry Point — `Application.java`
+
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.training.springboot.databse.DatabaseConnection;
+import com.training.springboot.databse.EmailConnection;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		
+		// Retrieving beans from container
+		DatabaseConnection databaseConnection = context.getBean("databaseConnection", DatabaseConnection.class);
+		System.out.println(databaseConnection);
+		
+		DatabaseConnection databaseConnection2 = context.getBean("databaseConnection", DatabaseConnection.class);
+		System.out.println(databaseConnection2);
+		
+		EmailConnection emailConnection = context.getBean("emailConnection", EmailConnection.class);
+		System.out.println(emailConnection);
+		
+		EmailConnection emailConnection2 = context.getBean("emailConnection2", EmailConnection.class);
+		System.out.println(emailConnection2);
+	}
+}
+```
+
+### 🧠 Explanation:
+- `@SpringBootApplication`: Marks the main class as the Spring Boot entry point.
+- `SpringApplication.run(...)`: Starts the application and initializes the Spring context.
+- `context.getBean(...)`: Fetches a bean managed by the Spring container.
+
+**Output shows:**  
+👉 Singleton beans return the same object reference.  
+👉 Prototype beans return different object references.
+
+---
+
+## 🗄️ 4. Database Bean — `DatabaseConnection.java`
+
+```java
+package com.training.springboot.databse;
+
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+//@Scope("prototype")
+@Component
+public class DatabaseConnection implements InitializingBean, DisposableBean {
+
+	@Value("localhost:1521")
+	private String url;
+
+	private String userName;
+	private String password;
+
+	public DatabaseConnection() {
+		System.out.println("Database is created");
+	}
+
+	public String getUrl() { return url; }
+	public void setUrl(String url) { this.url = url; }
+
+	public String getUserName() { return userName; }
+
+	@Value("root")
+	public void setUserName(String userName) {
+		System.out.println("Setting the value of username");
+		this.userName = userName;
+	}
+
+	public String getPassword() { return password; }
+	public void setPassword(String password) { this.password = password; }
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("This is afterPropertiesSet() call — Bean initialized");
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		System.out.println("Releasing resources — Bean destroyed");
+	}
+}
+```
+
+### 🧩 Key Terminology:
+
+| Term | Description |
+|------|--------------|
+| **@Component** | Marks this class as a Spring-managed bean |
+| **@Value** | Injects literal values into bean fields |
+| **InitializingBean** | Interface used to execute logic *after* bean properties are set |
+| **DisposableBean** | Interface used to execute logic *before* bean destruction |
+| **@Scope("prototype")** | Creates a new instance of the bean each time it’s requested (default is `singleton`) |
+
+---
+
+## 📧 5. Email Bean — `EmailConnection.java`
+
+```java
+package com.training.springboot.databse;
+
+import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+@Component
+public class EmailConnection {
+
+	public EmailConnection() {
+		System.out.println("Email is created");
+	}
+
+	@PostConstruct
+	public void logicBeanCreation() {
+		System.out.println("This is life cycle method: After Construction and Configuration");
+	}
+
+	@PreDestroy
+	public void logicOnBeanDestruction() {
+		System.out.println("This is life cycle method: Before Destruction");
+	}
+
+	public void email2LifeCycle() {
+		System.out.println("email2LifeCycle..............");
+	}
+
+	public void email2LifeCycleDestroy() {
+		System.out.println("email2LifeCycleDestroy.................................");
+	}
+}
+```
+
+### 🧩 Key Annotations:
+
+| Annotation | Description |
+|-------------|--------------|
+| **@PostConstruct** | Runs immediately after the bean is created and dependencies are injected |
+| **@PreDestroy** | Runs right before the bean is destroyed |
+| **@Component** | Registers the class as a Spring-managed component |
+
+---
+
+## ⚙️ 6. Java Configuration — `SprinBeansConfiguration.java`
+
+```java
+package com.training.springboot.databse;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SprinBeansConfiguration {
+
+	@Bean(initMethod = "email2LifeCycle", destroyMethod = "email2LifeCycleDestroy")
+	public EmailConnection emailConnection2() {
+		return new EmailConnection();
+	}
+
+	@Bean
+	public EmailConnection emailConnection3() {
+		return new EmailConnection();
+	}
+}
+```
+
+### 🧠 Explanation:
+- **@Configuration** — tells Spring that this class provides bean definitions.
+- **@Bean** — manually creates and registers beans in the container.
+- **initMethod / destroyMethod** — specify custom initialization and cleanup methods.
+
+---
+
+## 🔁 7. Bean Lifecycle Summary
+
+Here’s how the **Bean Lifecycle** works:
+
+| Phase | Description | Method/Annotation |
+|-------|--------------|-------------------|
+| 1️⃣ Creation | Object is created (constructor called) | Constructor |
+| 2️⃣ Dependency Injection | Values are injected (@Value, @Autowired) | - |
+| 3️⃣ Initialization | Custom logic after dependencies are set | `afterPropertiesSet()` / `@PostConstruct` |
+| 4️⃣ Ready to Use | Bean is available for use | - |
+| 5️⃣ Destruction | Cleanup before bean is removed | `destroy()` / `@PreDestroy` |
+
+---
+
+## 🌍 8. Singleton vs Prototype Scope
+
+| Feature | Singleton | Prototype |
+|----------|------------|-----------|
+| Instances | Only one per Spring container | New instance for each request |
+| Default Scope | ✅ Yes | ❌ No |
+| Lifecycle Management | Fully managed by container | Only initialization managed |
+| Example Use Case | Service / Repository | Temporary objects or DTOs |
+
+To make a bean **prototype**, uncomment:
+```java
+@Scope("prototype")
+```
+
+---
+
+## 🧾 9. Console Output (Example)
+
+```
+Database is created
+Setting the value of username
+This is afterPropertiesSet() call — Bean initialized
+Email is created
+This is life cycle method: After Construction and Configuration
+Email is created
+email2LifeCycle..............
+```
+
+---
+
+## 🧠 10. Summary
+
+| Concept | Key Idea |
+|----------|-----------|
+| **Spring Container** | Manages creation, initialization, and destruction of beans |
+| **Bean Lifecycle** | Sequence of events from creation → use → destruction |
+| **@PostConstruct & @PreDestroy** | Annotation-based lifecycle management |
+| **InitializingBean & DisposableBean** | Interface-based lifecycle management |
+| **@Bean (initMethod/destroyMethod)** | Java config-based lifecycle management |
+| **@Scope("prototype")** | Creates multiple bean instances |
+| **Default scope** | Singleton |
+
+---
+
+✅ **Learning Tip:**  
+When learning Spring Boot Bean lifecycle:
+1. Start with `@Component` and understand how Spring creates beans.  
+2. Then add lifecycle interfaces (`InitializingBean`, `DisposableBean`).  
+3. Finally, move to annotations (`@PostConstruct`, `@PreDestroy`) and configuration-based beans.
+
+---
+
+**Author:** Raushan Singh  
+**Topic:** Spring Boot – Bean Lifecycle and Scope  
+**Level:** Beginner → Intermediate → Advanced
+
