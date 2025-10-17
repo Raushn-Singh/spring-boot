@@ -1293,4 +1293,292 @@ Lower order number = higher priority.
 
 These concepts are **essential for backend developers** who want to manage initialization logic effectively in Spring Boot applications.
 
+# Spring Boot Bean Lifecycle, Scope, and JDBC Table Creation Explained
+
+This Markdown file covers multiple Spring Boot concepts — from **bean lifecycle** to **database table creation** and **data operations using JdbcTemplate** — explained step-by-step for complete beginners to intermediate learners.
+
+---
+
+## 🧩 Topic: Spring Boot JDBC Integration and Table Creation
+
+### 📘 Overview
+
+In this section, we will learn how to **create database tables** and perform **CRUD operations** (Create, Read, Update, Delete) using **Spring Boot’s JdbcTemplate**.
+
+### 🧱 What is JdbcTemplate?
+
+`JdbcTemplate` is a Spring class that simplifies database interaction. Instead of writing long JDBC boilerplate code (like connection handling, statements, and result sets), we can perform database operations with just a few lines.
+
+JdbcTemplate is automatically configured by Spring Boot when you have the following dependencies:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jdbc</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+Your `application.properties` should include database connection details:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/your_database
+spring.datasource.username=root
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+```
+
+---
+
+## 🧩 Example 1: Table Creation using CommandLineRunner
+
+### 🧠 Concept
+
+When you want to **create a table automatically** at startup, you can use `CommandLineRunner`. The logic inside `run()` executes right after the application context starts.
+
+### 💻 Code Example
+
+```java
+package com.training.springboot.tablecreation;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+class TableCreator implements CommandLineRunner {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public TableCreator(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        String sql = "CREATE TABLE IF NOT EXISTS employee (" +
+                     "id INT AUTO_INCREMENT PRIMARY KEY," +
+                     "name VARCHAR(50) NOT NULL," +
+                     "email VARCHAR(50) NOT NULL UNIQUE," +
+                     "password VARCHAR(50) NOT NULL," +
+                     "mobileNo BIGINT," +
+                     "gender CHAR(1)," +
+                     "isMarried BOOLEAN," +
+                     "workingHour FLOAT," +
+                     "salary DOUBLE," +
+                     "dob DATE," +
+                     "joinedAt DATETIME" +
+                     ")";
+        jdbcTemplate.execute(sql);
+        System.out.println("Employee table created successfully!");
+    }
+}
+```
+
+### 🧩 Explanation
+
+* `@Component`: Marks this class as a Spring-managed bean.
+* `CommandLineRunner`: Runs code after the application context starts.
+* `JdbcTemplate.execute(sql)`: Executes raw SQL commands.
+* `CREATE TABLE IF NOT EXISTS`: Ensures table is created only if it doesn’t already exist.
+
+### ✅ Output
+
+```
+Employee table created successfully!
+```
+
+---
+
+## 🧩 Example 2: Spring Boot Application Starter
+
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.training.springboot.impl.DatabaseOperations;
+import com.training.springboot.impl.ProductManagement;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+        
+        ProductManagement management = context.getBean("productManagement", ProductManagement.class);
+        management.loadAllProducts();
+    }
+}
+```
+
+### 🧠 Concept
+
+This is the **entry point** of the Spring Boot application. It loads the Spring Context, auto-configures beans, and executes runners.
+
+### 📖 Explanation
+
+* `SpringApplication.run()` starts the Spring Boot application.
+* `ConfigurableApplicationContext` allows you to access Spring beans programmatically.
+* Beans like `ProductManagement` or `DatabaseOperations` are auto-created because of the `@Component` annotation.
+
+---
+
+## 🧩 Example 3: CRUD Operations using JdbcTemplate
+
+### 🧱 1. Add and Delete Product — DatabaseOperations.java
+
+```java
+package com.training.springboot.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DatabaseOperations {
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+    public void addProduct() {
+        jdbcTemplate.update("INSERT INTO product VALUES(105,'iphone16',80000)");
+        System.out.println("Product added successfully!");
+    }
+
+    public void deleteProduct() {
+        jdbcTemplate.update("DELETE FROM product WHERE pid=102");
+        System.out.println("Product deleted successfully!");
+    }
+}
+```
+
+### 🧩 Explanation
+
+* `jdbcTemplate.update()` is used for **INSERT**, **UPDATE**, or **DELETE** operations.
+* The SQL query is directly passed inside the `update()` method.
+
+---
+
+### 🧱 2. ProductDetails.java — Model Class
+
+```java
+package com.training.springboot.impl;
+
+public class ProductDetails {
+
+    private int pid;
+    private String pname;
+    private double price;
+
+    // Getters and Setters
+    public int getPid() { return pid; }
+    public void setPid(int pid) { this.pid = pid; }
+
+    public String getPname() { return pname; }
+    public void setPname(String pname) { this.pname = pname; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
+```
+
+### 🧩 Explanation
+
+This is a **POJO (Plain Old Java Object)** used to map data from database rows into Java objects.
+
+---
+
+### 🧱 3. ProductManagement.java — Select Query and Data Mapping
+
+```java
+package com.training.springboot.impl;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ProductManagement {
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+    public void saveProducts() {
+        String query = "INSERT INTO product VALUES(?,?,?)";
+        jdbcTemplate.update(query, 1111, "Samsung", 100000);
+        System.out.println("Product saved successfully!");
+    }
+
+    public void loadAllProducts() {
+        String query = "SELECT * FROM product";
+        List<ProductDetails> list = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ProductDetails.class));
+
+        list.forEach(product -> {
+            System.out.println(product.getPid());
+            System.out.println(product.getPname());
+            System.out.println(product.getPrice());
+        });
+    }
+}
+```
+
+### 🧩 Explanation
+
+* `jdbcTemplate.query()` is used for **SELECT** statements.
+* `BeanPropertyRowMapper` automatically maps table columns to Java object fields based on name matching.
+* Data is printed for all retrieved rows.
+
+### ✅ Output Example
+
+```
+101
+MacBook Air
+150000.0
+105
+iPhone 16
+80000.0
+```
+
+---
+
+## 💡 Summary
+
+| Concept                 | Description                                                    |
+| ----------------------- | -------------------------------------------------------------- |
+| `JdbcTemplate`          | Simplifies JDBC operations like querying and updates.          |
+| `CommandLineRunner`     | Runs custom logic after application startup.                   |
+| `BeanPropertyRowMapper` | Maps table columns to Java object fields.                      |
+| `@Autowired`            | Automatically injects the required bean (like `JdbcTemplate`). |
+| `@Component`            | Marks the class as a Spring-managed bean.                      |
+
+---
+
+## 🚀 Advanced Insights
+
+* Spring Boot automatically configures a DataSource if it finds the necessary dependencies.
+* You can use `ApplicationRunner` for more control over argument parsing.
+* `JdbcTemplate` helps prevent SQL injection when used with parameterized queries.
+* For large applications, move SQL queries to a separate **Repository Layer**.
+
+---
+
+✅ **Now you’ve learned:**
+
+* How to auto-create tables at startup.
+* How to perform CRUD operations using JdbcTemplate.
+* How to use POJOs and Bean Mappers for structured data handling.
+
+This explanation ensures any beginner can understand the **complete flow** of database handling in Spring Boot.
+
+
 
