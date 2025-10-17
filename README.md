@@ -1021,3 +1021,276 @@ When learning Spring Boot Bean lifecycle:
 **Topic:** Spring Boot – Bean Lifecycle and Scope  
 **Level:** Beginner → Intermediate → Advanced
 
+# Spring Boot Runners (CommandLineRunner & ApplicationRunner)
+
+This section explains **Spring Boot Runners** — a powerful feature that allows developers to execute specific logic **right after the application starts**. It includes full code examples and beginner-to-advanced explanations.
+
+---
+
+## 🧩 What Are Runners in Spring Boot?
+
+Runners are special classes that execute **immediately after** the Spring Boot application context has been initialized (i.e., after `SpringApplication.run()` completes).
+
+They are typically used for:
+
+* Initializing configuration data.
+* Connecting to external systems (like sending notifications, emails, etc.).
+* Executing startup logic only once when the app boots.
+
+Spring Boot provides **two types of runners**:
+
+1. **CommandLineRunner** → Access command-line arguments as a `String... args` array.
+2. **ApplicationRunner** → Access command-line arguments as an `ApplicationArguments` object (structured form).
+
+Both interfaces have a single abstract method called `run()` which is automatically executed at application startup.
+
+---
+
+## 🧱 Example: Application Setup
+
+### **`Application.java`**
+
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.training.springboot.beans.Product;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        System.out.println("Args size :" + args.length);
+        System.out.println("Args value :" + args);
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+
+        System.out.println("Before Run Method");
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+
+        System.out.println("After Run Method");
+        Product product = context.getBean(Product.class);
+        System.out.println(product);
+    }
+}
+```
+
+### **Explanation**
+
+* The application prints command-line arguments.
+* It initializes the Spring context.
+* Runners (explained below) are executed **automatically after** `SpringApplication.run()`.
+
+---
+
+## 🧠 Understanding CommandLineRunner
+
+### **Definition**
+
+`CommandLineRunner` is a functional interface with one method:
+
+```java
+void run(String... args) throws Exception;
+```
+
+* It receives command-line arguments as a **String array**.
+* Executes once right after the application starts.
+
+### **Example: Email Notification Runner**
+
+```java
+package com.training.springboot.runners;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Order(1)
+@Component
+public class EmailNotificationRunner implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) throws Exception {
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+        System.out.println("This is CommandLineRunner...");
+        System.out.println("Application is ready to operate.");
+        System.out.println("Sending email to developer...");
+        System.out.println("Email successfully sent!");
+    }
+
+    public void runAnother() {
+        System.out.println("This is not part of Spring Boot runner method");
+    }
+}
+```
+
+### **Key Points**
+
+* Marked with `@Component` → Automatically discovered by Spring Boot.
+* `@Order(1)` → Ensures the runner runs **first** if multiple runners exist.
+* The `run()` method executes logic like sending emails after startup.
+
+---
+
+## 📱 Another Example: Push Notification Runner
+
+```java
+package com.training.springboot.runners;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Order(3)
+@Component
+public class PushNotification implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) throws Exception {
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+        System.out.println("Sending push notification to manager team...");
+        System.out.println("Push notification sent!");
+    }
+}
+```
+
+### **Explanation**
+
+* Uses `@Order(3)` → This runner executes **after** Email and TextMessage runners.
+* Demonstrates how multiple runners can run in sequence.
+
+---
+
+## 💬 Understanding ApplicationRunner
+
+### **Definition**
+
+`ApplicationRunner` is another interface used for post-startup logic, but it provides arguments as an **ApplicationArguments** object:
+
+```java
+void run(ApplicationArguments args) throws Exception;
+```
+
+* Gives structured access to **option** and **non-option** arguments.
+
+### **Example: Text Message Notification**
+
+```java
+package com.training.springboot.runners;
+
+import java.util.List;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Order(2)
+@Component
+public class TextMessageNotification implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        List<String> values = args.getNonOptionArgs();
+        for (String value : values) {
+            System.out.println(value);
+        }
+        System.out.println("Sending Text Message to Management...");
+    }
+}
+```
+
+### **Key Points**
+
+* `ApplicationArguments` gives more control than simple `String... args`.
+* Helps when parsing arguments passed during application startup.
+
+---
+
+## 🧱 Supporting Bean Example
+
+### **Product.java**
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Product {
+    public Product() {
+        System.out.println("Product is created");
+    }
+}
+```
+
+### **Explanation**
+
+* A simple bean loaded at startup.
+* Shows that beans are available when runners execute.
+
+---
+
+## ⚙️ Execution Flow
+
+When you start the Spring Boot app:
+
+1. `main()` executes → calls `SpringApplication.run()`.
+2. Spring Boot loads the **ApplicationContext**.
+3. All `@Component` beans are created.
+4. Runners (`CommandLineRunner` / `ApplicationRunner`) execute **immediately after startup**.
+5. The application becomes ready to process further requests.
+
+---
+
+## 🚦 Ordering Multiple Runners
+
+When you have multiple runners, you can control execution order using:
+
+```java
+@Order(1) // Executes first
+@Order(2) // Executes second
+@Order(3) // Executes third
+```
+
+Lower order number = higher priority.
+
+---
+
+## 🔍 Comparison Table
+
+| Feature          | CommandLineRunner            | ApplicationRunner                               |
+| ---------------- | ---------------------------- | ----------------------------------------------- |
+| Input Type       | String... args               | ApplicationArguments                            |
+| Purpose          | Simple argument handling     | Structured argument handling                    |
+| Common Use       | Logging, emails, basic setup | Config initialization, complex argument parsing |
+| Interface Method | `run(String... args)`        | `run(ApplicationArguments args)`                |
+
+---
+
+## 🧩 Real-World Use Cases
+
+* Load default data into database after app start.
+* Validate environment configuration.
+* Send startup notification (email/SMS).
+* Preload caches or configuration files.
+
+---
+
+## ✅ Summary
+
+* **Runners = Post-startup executors.**
+* Use them for one-time startup logic.
+* `@Order` defines execution sequence.
+* `CommandLineRunner` for simple args, `ApplicationRunner` for structured args.
+
+These concepts are **essential for backend developers** who want to manage initialization logic effectively in Spring Boot applications.
+
+
