@@ -234,4 +234,289 @@ public class Garrage {
 
 ---
 
-This Markdown file now contains **all your code and explanations** without modifying the original code structure.
+# Spring Boot Configuration Example – Complete Explanation
+
+This project demonstrates **Spring Boot's configuration and dependency injection** using `@Value`, `@Autowired`, and `@PropertySource` annotations. It loads configuration values from external property files and injects them into beans.
+
+---
+
+## 🧩 1. Application Entry Point – `Application.java`
+
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.PropertySource;
+
+import com.training.springboot.beans.AwsDatabaseConfiguration;
+import com.training.springboot.beans.DatabaseCofiguration;
+import com.training.springboot.beans.EmailsCrdentialsConfiguration;
+import com.training.springboot.beans.org.OrganizationInfo;
+
+@PropertySource("aws-database.properties") // Loads additional property file
+@SpringBootApplication // Enables Spring Boot auto-configuration and component scanning
+public class Application {
+	public static void main(String[] args) {
+		// Starts the Spring Boot application and returns the application context
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+
+		// Fetching Database configuration bean
+		DatabaseCofiguration cofiguration = context.getBean("databaseCofiguration", DatabaseCofiguration.class);
+		System.out.println(cofiguration.getPort());
+		System.out.println(cofiguration.getUrl());
+		System.out.println(cofiguration.getUserName());
+		System.out.println(cofiguration.getPassword());
+		System.out.println(cofiguration.getAppName());
+		System.out.println(cofiguration.getDbProfile().getUrl());
+
+		// Fetching Email configuration bean
+		System.out.println("******* Email Data ****");
+		EmailsCrdentialsConfiguration emailConfig = context.getBean("emailsCrdentialsConfiguration", EmailsCrdentialsConfiguration.class);
+		System.out.println(emailConfig.getEmailHost());
+		System.out.println(emailConfig.getEmailId());
+		System.out.println(emailConfig.getPassword());
+
+		// Fetching Organization Info bean
+		System.out.println("***** Org Data ******");
+		OrganizationInfo info = context.getBean("organizationInfo", OrganizationInfo.class);
+		System.out.println(info.getOrgEmpCount());
+		info.getDeptNames().forEach(System.out::println);
+
+		// Fetching AWS Database Configuration bean
+		System.out.println("******************************");
+		AwsDatabaseConfiguration awsConfig = context.getBean("awsDatabaseConfiguration", AwsDatabaseConfiguration.class);
+		System.out.println(awsConfig.getAwsUserName());
+		System.out.println(awsConfig.getAwsPassword());
+		System.out.println(awsConfig.getAwsHost());
+	}
+}
+```
+
+### 🔍 Explanation:
+
+* **`@SpringBootApplication`**: Combines `@Configuration`, `@EnableAutoConfiguration`, and `@ComponentScan`.
+* **`@PropertySource`**: Loads properties from an external file (e.g., `aws-database.properties`).
+* **`ConfigurableApplicationContext`**: Used to access beans created by Spring.
+
+---
+
+## ⚙️ 2. AWS Database Configuration – `AwsDatabaseConfiguration.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AwsDatabaseConfiguration {
+    @Value("${aws.db.url}")
+    private String awsHost;
+
+    @Value("${aws.db.user.name}")
+    private String awsUserName;
+
+    @Value("${aws.db.password}")
+    private String awsPassword;
+
+    // Getters and Setters
+}
+```
+
+### 🔍 Explanation:
+
+* Injects AWS database details from the property file.
+* Uses **`@Value`** to bind property keys to Java fields.
+
+Example in `aws-database.properties`:
+
+```properties
+aws.db.url=aws.amazonserver.com
+aws.db.user.name=aws_user
+aws.db.password=aws_pass
+```
+
+---
+
+## 🗄️ 3. Local Database Configuration – `DatabaseCofiguration.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DatabaseCofiguration {
+    @Value("${db.port.number}")
+    private int port;
+
+    @Value("${db.url}")
+    private String url;
+
+    @Value("${db.username}")
+    private String userName;
+
+    @Value("${db.password}")
+    private String password;
+
+    @Value("${spring.application.name}")
+    private String appName;
+
+    @Autowired
+    private DbProfile dbProfile; // Injects another bean
+
+    public DatabaseCofiguration() {
+        System.out.println("Db is created...");
+    }
+
+    // Getters and Setters
+}
+```
+
+### 🔍 Explanation:
+
+* Demonstrates **field injection** using `@Value`.
+* Uses **`@Autowired`** to inject another bean (`DbProfile`).
+* Useful when multiple configuration sources exist.
+
+Example in `application.properties`:
+
+```properties
+db.port.number=1521
+db.url=localhost:1521:xe
+db.username=root
+db.password=root
+spring.application.name=SpringBootConfigDemo
+```
+
+---
+
+## 🧮 4. Database Profile Bean – `DbProfile.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component("production")
+public class DbProfile {
+   @Value("${db.url}")
+   private String url;
+
+   // Getter and Setter
+}
+```
+
+### 🔍 Explanation:
+
+* Defines a **profile-specific** database URL.
+* `@Component("production")` gives a custom bean name.
+
+---
+
+## 📧 5. Email Credentials Configuration – `EmailsCrdentialsConfiguration.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmailsCrdentialsConfiguration {
+
+    private String emailHost;
+
+    @Value("${app.mail.user}")
+    private String emailId;
+
+    private String password;
+
+    @Autowired
+    private DatabaseCofiguration databaseCofiguration;
+
+    public EmailsCrdentialsConfiguration(@Value("${app.mail.host}") String emailHost) {
+        this.emailHost = emailHost;
+    }
+
+    @Value("${app.mail.password}")
+    public void setPassword(String password) {
+        System.out.println("setEmailPassword");
+        this.password = password;
+    }
+
+    // Getters and Setters
+}
+```
+
+### 🔍 Explanation:
+
+* Shows **constructor injection**, **setter injection**, and **field injection**.
+* Demonstrates multiple ways to inject values using `@Value`.
+
+Example in `application.properties`:
+
+```properties
+app.mail.host=smtp.gmail.com
+app.mail.user=test@gmail.com
+app.mail.password=test123
+```
+
+---
+
+## 🏢 6. Organization Info – `OrganizationInfo.java`
+
+```java
+package com.training.springboot.beans.org;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrganizationInfo {
+    @Value("${org.emp.count:55}") // default value if key is missing
+    private int orgEmpCount;
+
+    @Value("${org.dept.names}")
+    private List<String> deptNames;
+
+    // Getters and Setters
+}
+```
+
+### 🔍 Explanation:
+
+* Injects **list values** directly from the property file.
+* Uses **default value** `55` when key is not present.
+
+Example in `application.properties`:
+
+```properties
+org.emp.count=120
+org.dept.names=HR,Finance,IT,Sales
+```
+
+---
+
+## 📘 Summary
+
+| Concept                | Annotation Used             | Description                           |
+| ---------------------- | --------------------------- | ------------------------------------- |
+| External Configuration | `@Value`, `@PropertySource` | Injects property values into fields   |
+| Bean Creation          | `@Component`                | Marks class as a Spring-managed bean  |
+| Dependency Injection   | `@Autowired`                | Automatically injects dependent beans |
+| Constructor Injection  | `@Value` in constructor     | Provides value at object creation     |
+| Setter Injection       | `@Value` on setter          | Sets value using setter method        |
+| Lists and Defaults     | `@Value` with default       | Handles multiple values and fallbacks |
+
+---
+
+✅ **This example is perfect for beginners** who want to learn how to use `@Value`, `@Autowired`, and property files in Spring Boot. It shows all major injection techniques in one practical example.
+
