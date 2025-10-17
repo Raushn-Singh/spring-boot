@@ -520,3 +520,220 @@ org.dept.names=HR,Finance,IT,Sales
 
 ✅ **This example is perfect for beginners** who want to learn how to use `@Value`, `@Autowired`, and property files in Spring Boot. It shows all major injection techniques in one practical example.
 
+# Spring Boot Bean Scopes and Dependency Injection – Beginner Friendly Guide
+
+This example demonstrates how **Spring Boot manages beans**, their **scopes**, and how **dependency injection (DI)** works using annotations like `@Autowired`, `@Bean`, `@Component`, and `@Scope`.
+
+---
+
+## 🧩 1. Application Entry Point – `Application.java`
+
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+
+import com.training.springboot.beans.Order;
+import com.training.springboot.beans.Product;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+
+		// Getting Product bean from container
+		Product product = context.getBean("product", Product.class);
+		System.out.println(product);
+
+		// Again fetching same bean to check if it creates a new instance or not
+		Product product2 = context.getBean("product", Product.class);
+		System.out.println(product2);
+
+		// Getting Order bean which has Product injected
+		Order order = context.getBean("order", Order.class);
+		System.out.println(order);
+		System.out.println(order.getProduct());
+
+		Order order1 = context.getBean("order", Order.class);
+		System.out.println(order1);
+		System.out.println(order1.getProduct());
+
+		// DI : Is it created a new Product to inject in Order? → No (because singleton)
+
+		System.out.println("*********************** 2nd Product **** ");
+		Product product3 = context.getBean("product2", Product.class);
+		System.out.println(product3);
+	}
+
+	// Creating another Product bean manually using @Bean
+	@Bean
+	Product product2() {
+		return new Product();
+	}
+}
+```
+
+### 🔍 Explanation of Basic Terms:
+
+* **Bean:** An object managed by Spring’s IoC container.
+* **IoC (Inversion of Control):** Spring creates and manages objects for you.
+* **DI (Dependency Injection):** Injecting one bean into another automatically (e.g., Product into Order).
+* **ApplicationContext:** Spring container that holds and manages beans.
+
+### 💡 Key Concepts:
+
+* When a bean is requested with `context.getBean()`, Spring returns it from the container.
+* If the bean scope is **singleton** (default), the same object reference is returned every time.
+* If the scope is **prototype**, a new object is created on each request.
+
+---
+
+## 🏗️ 2. Order Bean – `Order.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Order {
+	@Autowired
+	private Product product; // Dependency Injection
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+}
+```
+
+### 🔍 Explanation:
+
+* **`@Component`**: Marks the class as a Spring bean.
+* **`@Autowired`**: Automatically injects a matching bean (here, `Product`) from the container.
+* When Spring creates an `Order` bean, it automatically sets its `product` field.
+
+---
+
+## 📦 3. Product Bean – `Product.java`
+
+```java
+package com.training.springboot.beans;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+//@Scope(value = "prototype") // Uncomment to test prototype behavior
+@Component
+public class Product {
+	private int productId;
+	private String productName;
+	private double price;
+
+	public Product() {
+		super();
+		System.out.println("Product one is created");
+	}
+
+	// Getters and Setters
+	public int getProductId() {
+		return productId;
+	}
+
+	public void setProductId(int productId) {
+		this.productId = productId;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+}
+```
+
+### 🔍 Explanation:
+
+* By default, beans in Spring are **singleton**.
+* The `Product` constructor prints a message each time it is created — helping us see when new objects are made.
+* Uncomment `@Scope("prototype")` to make a new Product each time it’s requested.
+
+---
+
+## 🧠 4. Understanding Bean Scopes
+
+Spring provides **5 main bean scopes**:
+
+| Scope                   | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| **singleton** (default) | Only one instance per Spring container. Same object shared everywhere. |
+| **prototype**           | A new bean instance is created each time it is requested.              |
+| **request**             | One bean per HTTP request (used in web apps).                          |
+| **session**             | One bean per HTTP session (used in web apps).                          |
+| **application**         | One bean for the entire application lifecycle.                         |
+| **webSocket**           | One bean per WebSocket session.                                        |
+
+### Example:
+
+```java
+@Scope("singleton") // default scope
+@Component
+public class Product {}
+
+@Scope("prototype")
+@Component
+public class Order {}
+```
+
+---
+
+## ⚙️ 5. Bean Lifecycle (Simple View for Beginners)
+
+When Spring manages a bean, it goes through **4 main phases**:
+
+1. **Construction** – Bean object is created.
+2. **Configuration** – Dependencies are injected (like `@Autowired`).
+3. **Utilization** – Bean is used for business logic.
+4. **Destruction** – Bean is destroyed when the container shuts down.
+
+---
+
+## ✅ Summary for Beginners
+
+| Concept                       | Explanation                                             |
+| ----------------------------- | ------------------------------------------------------- |
+| **Bean**                      | Object managed by Spring container                      |
+| **Scope**                     | Defines how many instances of the bean exist            |
+| **DI (Dependency Injection)** | Injecting dependent beans automatically                 |
+| **Singleton Scope**           | Only one bean instance for the entire app               |
+| **Prototype Scope**           | Creates a new instance every time you request the bean  |
+| **@Autowired**                | Automatically wires dependent beans                     |
+| **@Bean**                     | Defines a bean method manually in a configuration class |
+
+---
+
+### 🧩 Tip:
+
+If you see the same memory reference printed for two beans, it means **singleton scope** is active. Different references mean **prototype scope** is used.
+
+---
+
+This explanation helps beginners clearly understand how **Spring Boot creates and injects beans**, how **scopes affect object creation**, and how **the lifecycle of a bean** works in simple, real-world terms.
