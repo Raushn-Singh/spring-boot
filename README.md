@@ -1580,5 +1580,341 @@ iPhone 16
 
 This explanation ensures any beginner can understand the **complete flow** of database handling in Spring Boot.
 
+# 📘 Spring Boot JPA Practice — Step-by-Step Guide
 
+This guide includes **three complete examples** showing how to use **Spring Boot + Spring Data JPA** for CRUD operations.
+
+---
+
+## 🧩 Example 1: Product & User Information
+
+### 📁 Package Structure
+```
+com.training.springboot
+ ├── Application.java
+ ├── entity
+ │    ├── ProductDetails.java
+ │    └── UserInformations.java
+ ├── repositary
+ │    ├── ProductDetailsRepositary.java
+ │    └── UserDetailsRepo.java
+ └── operations
+      ├── DatabaseOperations.java
+      └── DatabaseOperationTwo.java
+```
+
+---
+
+### 🚀 Application.java
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import com.training.springboot.operations.DatabaseOperationTwo;
+
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+        DatabaseOperationTwo databaseOperationTwo = context.getBean("databaseOperationTwo", DatabaseOperationTwo.class);
+        databaseOperationTwo.loadAllProducts();
+    }
+}
+```
+
+---
+
+### 🧱 Entity: ProductDetails.java
+```java
+package com.training.springboot.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="product")
+public class ProductDetails {
+    @Id
+    @Column(name="pid")
+    private int productId;
+    @Column(name="pname")
+    private String productName;
+    @Column(name="price")
+    private double productPrice;
+
+    public ProductDetails() {}
+    public ProductDetails(int productId, String productName, double productPrice) {
+        this.productId = productId;
+        this.productName = productName;
+        this.productPrice = productPrice;
+    }
+
+    // getters and setters
+}
+```
+
+---
+
+### 🧱 Entity: UserInformations.java
+```java
+package com.training.springboot.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="USER_INFORMATION")
+public class UserInformations {
+    @Id
+    @Column(name="user_id")
+    private long userId;
+    private String name;
+    private String contact;
+
+    // getters, setters, and toString()
+}
+```
+
+---
+
+### 🧩 Repository Interfaces
+```java
+package com.training.springboot.repositary;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.training.springboot.entity.ProductDetails;
+
+public interface ProductDetailsRepositary extends JpaRepository<ProductDetails, Integer> { }
+```
+
+```java
+package com.training.springboot.repositary;
+
+import org.springframework.data.repository.CrudRepository;
+import com.training.springboot.entity.UserInformations;
+
+public interface UserDetailsRepo extends CrudRepository<UserInformations, Long> { }
+```
+
+---
+
+### ⚙️ Operation Classes
+
+#### DatabaseOperations.java
+```java
+package com.training.springboot.operations;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.training.springboot.entity.ProductDetails;
+import com.training.springboot.entity.UserInformations;
+import com.training.springboot.repositary.ProductDetailsRepositary;
+import com.training.springboot.repositary.UserDetailsRepo;
+
+@Component
+public class DatabaseOperations {
+    @Autowired   
+    ProductDetailsRepositary productDetailsRepositary;
+    @Autowired
+    UserDetailsRepo userDetailsRepo;
+
+    public void addProductInformation() {
+        ProductDetails p1 = new ProductDetails(111, "Samsung", 120000.99);
+        productDetailsRepositary.save(p1);
+    }
+
+    public void addUserInformation() {
+        UserInformations user = new UserInformations();
+        user.setUserId(1111);
+        user.setName("Raushan");
+        user.setContact("+91 6206481133");
+        userDetailsRepo.save(user);
+    }
+}
+```
+
+#### DatabaseOperationTwo.java
+```java
+package com.training.springboot.operations;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.training.springboot.entity.ProductDetails;
+import com.training.springboot.repositary.ProductDetailsRepositary;
+
+@Component
+public class DatabaseOperationTwo {
+    @Autowired
+    ProductDetailsRepositary productDetailsRepositary;
+
+    public void addMoreProducts() {
+        List<ProductDetails> allproducts = new ArrayList<>();
+        allproducts.add(new ProductDetails(222,"Mouse",50000));
+        allproducts.add(new ProductDetails(223,"Keyboard",50000));
+        allproducts.add(new ProductDetails(224,"Disk",50000));
+        allproducts.add(new ProductDetails(225,"Speaker",50000));
+        productDetailsRepositary.saveAll(allproducts);
+    }
+
+    public void loadAllProducts() {
+        List<ProductDetails> list = productDetailsRepositary.findAll();
+        list.forEach(System.out::println);
+    }
+}
+```
+
+---
+
+## 🧩 Example 2: Order Information
+
+### 📁 Package Structure
+```
+com.training.springboot
+ ├── Application.java
+ ├── OrderOperations.java
+ ├── entity/OrderInformation.java
+ └── repositary/OrderInformationRepositary.java
+```
+
+---
+
+### 🚀 Application.java
+```java
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+        OrderOperations operations = context.getBean(OrderOperations.class);
+        operations.addOrder();
+        operations.loadAllOrder();
+    }
+}
+```
+
+---
+
+### ⚙️ OrderOperations.java
+```java
+package com.training.springboot;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.training.springboot.entity.OrderInformation;
+import com.training.springboot.repositary.OrderInformationRepositary;
+
+@Component
+public class OrderOperations {
+    @Autowired
+    public OrderInformationRepositary orderRepositary;
+
+    public void addOrder() {
+        OrderInformation order = new OrderInformation(
+            1, "raushan786267@gmail.com", 3, "Raushan Singh", "6206481133",
+            "Buxar", 802111, 500000);
+        orderRepositary.save(order);
+    }
+
+    public void loadAllOrder() {
+        List<OrderInformation> list = orderRepositary.findAll();
+        list.forEach(System.out::println);
+    }
+}
+```
+
+---
+
+### 🧱 OrderInformation.java
+```java
+package com.training.springboot.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name="order_info")
+public class OrderInformation {
+    @Id
+    @Column(name="order_id")
+    private long orderId;
+    @Column(name="email_id")
+    private String emailId;
+    private int noOfItems;
+    private String name;
+    private String contact;
+    private String city;
+    private int pincode;
+    private double amount;
+}
+```
+
+---
+
+### 🧩 OrderInformationRepositary.java
+```java
+package com.training.springboot.repositary;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.training.springboot.entity.OrderInformation;
+
+public interface OrderInformationRepositary extends JpaRepository<OrderInformation, Long> { }
+```
+
+---
+
+✅ **JPA Configuration (application.properties)**
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/springdb
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+---
+
+📚 **Notes**
+- `ddl-auto=create` → creates tables each run  
+- `ddl-auto=update` → keeps data, updates schema  
+- `ddl-auto=create-drop` → drops after exit  
+- `ddl-auto=validate` → validates schema  
+- `ddl-auto=none` → disables schema management
+
+---
+
+### ✅ Output Example
+```
+ProductDetails [productId=222, productName=Mouse, productPrice=50000.0]
+ProductDetails [productId=223, productName=Keyboard, productPrice=50000.0]
+OrderInformation [orderId=1, name=Raushan Singh, amount=500000.0]
+```
+
+---
+
+### 🎯 Summary
+This Markdown document shows how to:
+- Create entities with JPA annotations  
+- Use `JpaRepository` and `CrudRepository`  
+- Perform basic CRUD operations  
+- Configure Hibernate via `application.properties`
+
+--
 
