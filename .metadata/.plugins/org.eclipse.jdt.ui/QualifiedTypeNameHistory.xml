@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="org.springframework.context.annotation.Primary"/>
-    <fullyQualifiedTypeName name="com.training.springboot.DatabaseCofiguration"/>
-    <fullyQualifiedTypeName name="java.lang.module.Configuration"/>
-    <fullyQualifiedTypeName name="com.training.springboot.beans.DbProfile"/>
-    <fullyQualifiedTypeName name="java.lang.String"/>
     <fullyQualifiedTypeName name="com.training.springboot.beans.EmailsCrdentialsConfiguration"/>
     <fullyQualifiedTypeName name="com.training.springboot.beans.DatabaseCofiguration"/>
     <fullyQualifiedTypeName name="com.training.springboot.beans.org.OrganizationInfo"/>
@@ -47,6 +42,10 @@
     <fullyQualifiedTypeName name="jakarta.transaction.Transactional"/>
     <fullyQualifiedTypeName name="org.springframework.transaction.annotation.Transactional"/>
     <fullyQualifiedTypeName name="com.training.springboot.modal.Employee"/>
+    <fullyQualifiedTypeName name="com.training.springboot.repositary.OrderInformationRepositary"/>
+    <fullyQualifiedTypeName name="com.training.springboot.entity.OrderInformation"/>
+    <fullyQualifiedTypeName name="com.training.springboot.OrderOperations"/>
+    <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.JpaRepository"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Entity"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Table"/>
     <fullyQualifiedTypeName name="lombok.Data"/>
@@ -54,10 +53,11 @@
     <fullyQualifiedTypeName name="lombok.NoArgsConstructor"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Id"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Column"/>
-    <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.JpaRepository"/>
     <fullyQualifiedTypeName name="org.springframework.stereotype.Component"/>
-    <fullyQualifiedTypeName name="com.training.springboot.repositary.OrderInformationRepositary"/>
+    <fullyQualifiedTypeName name="com.training.springboot.repositary.EmployeeRepoistary"/>
+    <fullyQualifiedTypeName name="com.training.springboot.service.EmployeeServices"/>
     <fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
-    <fullyQualifiedTypeName name="com.training.springboot.entity.OrderInformation"/>
-    <fullyQualifiedTypeName name="com.training.springboot.OrderOperations"/>
+    <fullyQualifiedTypeName name="com.training.springboot.entity.Employee"/>
+    <fullyQualifiedTypeName name="org.springframework.data.domain.Sort"/>
+    <fullyQualifiedTypeName name="org.springframework.data.domain.Sort.Direction"/>
 </qualifiedTypeNameHistroy>
