@@ -1,0 +1,9 @@
+package com.training.springboot.repositary;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.training.springboot.entity.Employee;
+
+public interface EmployeeRepositary extends JpaRepository<Employee, Long> {
+
+}

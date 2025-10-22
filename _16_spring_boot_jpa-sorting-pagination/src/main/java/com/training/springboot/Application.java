@@ -1,0 +1,17 @@
+package com.training.springboot;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.training.springboot.services.EmployeeServices;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		EmployeeServices services = context.getBean(EmployeeServices.class);
+		services.loadAllEmployees();
+	}
+}
