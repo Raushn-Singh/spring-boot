@@ -1,0 +1,33 @@
+package com.training.springboot.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.entity.Employee;
+import com.training.springboot.repositary.EmployeeRepositary;
+
+@Component
+public class EmployeeServices {
+    @Autowired
+	private EmployeeRepositary employeeRepositary;
+	public void addEmployee(Employee emp) {
+		employeeRepositary.save(emp);
+	}
+	public void loadAllEmployees() {
+		List<Employee> employees = employeeRepositary.findAll();
+		employees.forEach(System.out::println);
+	} 
+// sort :eid
+	public void loadAllEmployeesBtEidAsc() {
+		// sort.by -> entity property name
+		List<Employee> employees = employeeRepositary.findAll(Sort.by("name"));
+		employees.forEach(System.out::println);
+	} 
+     //	by default ascending order
+	// sort : eid -> descending order
+}
+
+

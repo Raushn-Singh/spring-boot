@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -22,5 +23,8 @@ public class EmployeeServices {
 		 Page<Employee> page = employeeRepositary.findAll(Pageable.ofSize(5));
 		 List<Employee> employees = page.getContent();
 		 employees.forEach(System.out::println);
+	}
+	public void getEmployeeDetails(int pageNo,int recordsPerPage) {
+	 employeeRepositary.findAll(PageRequest.of(pageNo, recordsPerPage)).getContent();
 	}
 }

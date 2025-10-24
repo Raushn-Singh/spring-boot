@@ -1,0 +1,24 @@
+package com.training.springboot.services;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import com.training.springboot.entity.Employee;
+import com.training.springboot.repositary.EmployeeRepositary;
+
+@Component
+public class EmployeeServices {
+
+	@Autowired
+	private EmployeeRepositary employeeRepositary;
+	// page : 3 records
+	public void loadAllEmployees() {
+		 Page<Employee> page = employeeRepositary.findAll(Pageable.ofSize(5));
+		 List<Employee> content = page.getContent();
+		//employees.forEach(System.out::println);
+	}
+}
